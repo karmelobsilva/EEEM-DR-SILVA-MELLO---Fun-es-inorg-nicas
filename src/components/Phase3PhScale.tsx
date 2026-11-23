@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ArrowRight,
@@ -30,10 +30,14 @@ interface Phase3PhScaleProps {
 const PH_TICKS = Array.from({ length: 15 }, (_, i) => i);
 
 const BeakerGraphic: React.FC<{
-  liquidGradient: string;
+  liquidColor: string;
   colorName: string;
   dropped: boolean;
-}> = ({ liquidGradient, colorName, dropped }) => {
+}> = ({ liquidColor, colorName, dropped }) => {
+  const uid = useId();
+  const clipId = `beaker-clip-${uid}`;
+  const gradId = `beaker-grad-${uid}`;
+
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative w-32 h-36 sm:w-36 sm:h-40 flex items-end justify-center">
@@ -55,9 +59,13 @@ const BeakerGraphic: React.FC<{
           aria-label={`Béquer com solução na cor ${colorName}`}
         >
           <defs>
-            <clipPath id="beakerClip">
+            <clipPath id={clipId}>
               <path d="M 24 22 L 24 104 Q 24 116 36 116 L 84 116 Q 96 116 96 104 L 96 22 Z" />
             </clipPath>
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={liquidColor} stopOpacity="0.82" />
+              <stop offset="100%" stopColor={liquidColor} stopOpacity="1" />
+            </linearGradient>
           </defs>
 
           {/* Glass interior background */}
@@ -67,24 +75,15 @@ const BeakerGraphic: React.FC<{
           />
 
           {/* Colored liquid */}
-          <g clipPath="url(#beakerClip)">
+          <g clipPath={`url(#${clipId})`}>
             <rect
               x="20"
-              y={dropped ? '50' : '56'}
+              y={dropped ? 50 : 56}
               width="80"
               height="70"
-              fill={dropped ? 'currentColor' : '#E2E8F0'}
+              fill={dropped ? `url(#${gradId})` : '#E2E8F0'}
               className="transition-all duration-500"
-              style={{ color: dropped ? undefined : '#E2E8F0' }}
             />
-            {dropped && (
-              <foreignObject x="20" y="50" width="80" height="70">
-                <div
-                  className="w-full h-full transition-all duration-500"
-                  style={{ background: liquidGradient }}
-                />
-              </foreignObject>
-            )}
             {/* Liquid meniscus highlight */}
             <ellipse
               cx="60"
@@ -253,7 +252,7 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
               </div>
 
               <BeakerGraphic
-                liquidGradient={introZoneObj.cabbageGradient}
+                liquidColor={introZoneObj.cabbageHex}
                 colorName={introZoneObj.cabbageColorName}
                 dropped={true}
               />
@@ -385,7 +384,7 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
           {/* Beaker with Red Cabbage Indicator */}
           <div className="sm:col-span-4 flex flex-col items-center justify-center rounded-2xl bg-slate-50 border border-slate-200/80 p-4">
             <BeakerGraphic
-              liquidGradient={currentZoneObj.cabbageGradient}
+              liquidColor={currentZoneObj.cabbageHex}
               colorName={currentZoneObj.cabbageColorName}
               dropped={indicatorDropped}
             />

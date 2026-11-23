@@ -147,30 +147,33 @@ export const Phase1Radar: React.FC<Phase1RadarProps> = ({
     }
   };
 
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (e: KeyboardEvent) => {
+    if (isAnswered) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        advanceNext(scoreTotal, answeredCount, correctCount);
+      }
+      return;
+    }
+    const keyMap: Record<string, ChemFunction> = {
+      '1': 'acid',
+      '2': 'base',
+      '3': 'salt',
+      '4': 'oxide',
+    };
+    if (keyMap[e.key]) {
+      e.preventDefault();
+      handleSelect(keyMap[e.key]);
+    }
+  };
+
   // Keyboard shortcuts 1-4 for fast desktop/whiteboard interaction
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (isAnswered) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          advanceNext(scoreTotal, answeredCount, correctCount);
-        }
-        return;
-      }
-      const keyMap: Record<string, ChemFunction> = {
-        '1': 'acid',
-        '2': 'base',
-        '3': 'salt',
-        '4': 'oxide',
-      };
-      if (keyMap[e.key]) {
-        e.preventDefault();
-        handleSelect(keyMap[e.key]);
-      }
-    };
+    const onKeyDown = (e: KeyboardEvent) => keyHandlerRef.current(e);
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  });
+  }, []);
 
   const correctMeta = FUNCTION_META[currentItem.func];
 
