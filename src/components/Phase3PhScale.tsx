@@ -259,7 +259,7 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
 
               <div className="space-y-1">
                 <p className="font-display font-bold text-lg text-slate-900">
-                  {introZoneObj.label} ({introZoneObj.rangeLabel})
+                  {introZoneObj.rangeLabel} · {introZoneObj.cabbageColorName}
                 </p>
                 <p className="text-xs text-slate-600 leading-relaxed">
                   {introZoneObj.cabbageNote}
@@ -267,10 +267,10 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
               </div>
             </div>
 
-            {/* 5 Color Bands Reference List */}
+            {/* 5 Color Bands Reference List (pH values + colors only, no character labels) */}
             <div className="md:col-span-7 space-y-3">
               <p className="text-xs font-bold text-slate-500">
-                Toque em cada faixa para testar a cor do repolho roxo:
+                Toque em cada faixa de pH para observar a cor do repolho roxo:
               </p>
 
               <div className="space-y-2">
@@ -296,16 +296,16 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
                           style={{ background: zone.cabbageGradient }}
                         />
                         <div className="min-w-0">
-                          <span className="font-display font-bold text-sm sm:text-base text-slate-900 block">
-                            {zone.label}
+                          <span className="font-mono font-bold text-sm sm:text-base text-slate-900 block tabular-nums">
+                            {zone.rangeLabel}
                           </span>
                           <span className="text-xs text-slate-500 block truncate">
                             Cor: {zone.cabbageColorName}
                           </span>
                         </div>
                       </div>
-                      <span className="font-mono text-xs sm:text-sm font-bold text-slate-800 shrink-0 tabular-nums">
-                        {zone.rangeLabel}
+                      <span className="text-xs font-semibold text-slate-500 shrink-0">
+                        Testar cor
                       </span>
                     </button>
                   );
@@ -322,7 +322,7 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
                 Como funciona a atividade
               </p>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Cada produto virá com o <strong>valor de pH medido</strong> e a reação de cor do repolho roxo no béquer. Associe o pH e a cor ao caráter correspondente (Ácido Forte, Ácido Fraco, Neutro, Básico Fraco ou Básico Forte).
+                Cada produto mostrará o <strong>valor de pH medido</strong> e a cor no béquer com repolho roxo. A partir do pH, você deverá deduzir e escolher o caráter escrito (Ácido Forte, Ácido Fraco, Neutro, Básico Fraco ou Básico Forte).
               </p>
             </div>
 
@@ -490,10 +490,10 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
           </div>
         </div>
 
-        {/* 5 Character Classification Buttons */}
+        {/* 5 Character Classification Buttons (Neutral written options, no color cues) */}
         <div className="space-y-2">
           <p className="text-xs font-semibold text-slate-500">
-            Qual é a classificação dessa amostra?
+            Com base no valor de pH, qual é o caráter desta amostra?
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
             {PH_ZONES.map((zone) => {
@@ -504,7 +504,7 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
                 'bg-white border-slate-200 hover:border-slate-400 hover:bg-slate-50 text-slate-900';
               if (isAnswered) {
                 if (isTrueZone) {
-                  styleClasses = 'text-white shadow-sm';
+                  styleClasses = 'bg-slate-900 border-slate-900 text-white shadow-sm';
                 } else if (isChosen && !isTrueZone) {
                   styleClasses = 'bg-rose-50 border-rose-300 text-rose-800';
                 } else {
@@ -518,34 +518,20 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
                   type="button"
                   disabled={isAnswered}
                   onClick={() => handleSelectCharacter(zone.id)}
-                  style={
-                    isAnswered && isTrueZone
-                      ? { backgroundColor: zone.color, borderColor: zone.color }
-                      : undefined
-                  }
-                  className={`min-h-[72px] p-3.5 rounded-2xl border-2 text-left flex flex-col justify-between transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${styleClasses}`}
+                  className={`min-h-[68px] p-3.5 rounded-2xl border-2 text-center flex flex-col items-center justify-center gap-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${styleClasses}`}
                 >
-                  <span
-                    className="w-4 h-4 rounded-full border border-black/10"
-                    style={{
-                      backgroundColor:
-                        isAnswered && isTrueZone ? '#FFFFFF' : zone.cabbageHex,
-                    }}
-                  />
-                  <div>
-                    <span className="font-display font-bold text-sm sm:text-base leading-tight block">
-                      {zone.label}
+                  <span className="font-display font-bold text-sm sm:text-base leading-tight block">
+                    {zone.label}
+                  </span>
+                  {isAnswered && (
+                    <span
+                      className={`font-mono text-xs tabular-nums ${
+                        isTrueZone ? 'text-slate-200' : 'opacity-75'
+                      }`}
+                    >
+                      {zone.rangeLabel}
                     </span>
-                    {isAnswered && (
-                      <span
-                        className={`font-mono text-xs tabular-nums ${
-                          isTrueZone ? 'text-white/90' : 'opacity-75'
-                        }`}
-                      >
-                        {zone.rangeLabel}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </button>
               );
             })}
@@ -628,6 +614,9 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
             </div>
 
             <div className="p-6 space-y-2.5">
+              <p className="text-xs text-slate-500 pb-1">
+                Cores do indicador de repolho roxo para cada faixa de pH:
+              </p>
               {PH_ZONES.map((zone) => (
                 <div
                   key={zone.id}
@@ -638,16 +627,11 @@ export const Phase3PhScale: React.FC<Phase3PhScaleProps> = ({
                       className="w-6 h-6 rounded-lg shrink-0 border border-black/10"
                       style={{ background: zone.cabbageGradient }}
                     />
-                    <div>
-                      <span className="font-display font-bold text-sm text-slate-900 block">
-                        {zone.label}
-                      </span>
-                      <span className="text-xs text-slate-500">
-                        {zone.cabbageColorName}
-                      </span>
-                    </div>
+                    <span className="font-display font-bold text-sm text-slate-900">
+                      {zone.cabbageColorName}
+                    </span>
                   </div>
-                  <span className="font-mono text-xs font-bold text-slate-800 tabular-nums">
+                  <span className="font-mono text-xs sm:text-sm font-bold text-slate-800 tabular-nums">
                     {zone.rangeLabel}
                   </span>
                 </div>
